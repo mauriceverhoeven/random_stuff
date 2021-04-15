@@ -2,5 +2,5 @@
 Some useful stuff that might be worth sharing
 
 
-1. [jq]
-2. [numpy]
+1. jq [./jq]
+2. numpy [./numpy]
