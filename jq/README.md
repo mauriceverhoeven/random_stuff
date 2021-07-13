@@ -47,7 +47,7 @@ using it on har files:
 jq '.log.entries[].request | {method,url}' $1 | jq 'if .method=="GET" then .url else "" end' | grep -Eo "http(s?)://([^/]+)./" | sort | uniq
 ```
 
-
+```
 cat browsertime.har| jq '.log.entries[]| {method: .request.method, status: .response.status, size: .response.headers[] | select(.name | contains("content-length")).value, url: .request.url, csp: .response.headers[] | select(.name | contains("content-security-policy")).value?, contenttype: .response.headers[] | select(.name | contains("content-type")).value  } ' | grep status
-
+```
 
