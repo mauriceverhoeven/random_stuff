@@ -51,3 +51,6 @@ jq '.log.entries[].request | {method,url}' $1 | jq 'if .method=="GET" then .url 
 cat browsertime.har| jq '.log.entries[]| {method: .request.method, status: .response.status, size: .response.headers[] | select(.name | contains("content-length")).value, url: .request.url, csp: .response.headers[] | select(.name | contains("content-security-policy")).value?, contenttype: .response.headers[] | select(.name | contains("content-type")).value  } ' | grep status
 ```
 
+```
+cat player.theplatform.eu.har | jq '.log.entries[] |select(.request.url | startswith("https://vod.tst1.talpatvcdn.nl/")) | {url: .request.url, size: .response.content.size}'
+```
