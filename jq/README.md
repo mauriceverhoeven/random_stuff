@@ -31,3 +31,10 @@ cat sample.json| jq -c  ".datapoints[] | [.id, .prop1, .prop2, .prop3, .prop4] |
 "160,228,5,100,19966"
 "161,228,5,200,20066"
 ```
+
+on a har download from your browser:
+
+```
+cat player.theplatform.eu.har | jq '.log.entries[] |select(.request.url | startswith("https://vod.tst1.talpatvcdn.nl/")) | {url: .request.url, size: .response.content.size}'
+
+```
