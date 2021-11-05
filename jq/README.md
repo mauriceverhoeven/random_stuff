@@ -32,9 +32,22 @@ cat sample.json| jq -c  ".datapoints[] | [.id, .prop1, .prop2, .prop3, .prop4] |
 "161,228,5,200,20066"
 ```
 
-on a har download from your browser:
+selecting stuff
+```
+echo '{"files": [{"fileName": "FOO","md5": "blablabla"}, {"fileName": "BAR","md5": "alaldlafj"}]}'  | jq '.files[] | select(.fileName=="FOO") '
+{
+  "fileName": "FOO",
+  "md5": "blablabla"
+}
+```
+
+using it on har files:
 
 ```
-cat player.theplatform.eu.har | jq '.log.entries[] |select(.request.url | startswith("https://vod.tst1.talpatvcdn.nl/")) | {url: .request.url, size: .response.content.size}'
+jq '.log.entries[].request | {method,url}' $1 | jq 'if .method=="GET" then .url else "" end' | grep -Eo "http(s?)://([^/]+)./" | sort | uniq
+```
 
 ```
+cat browsertime.har| jq '.log.entries[]| {method: .request.method, status: .response.status, size: .response.headers[] | select(.name | contains("content-length")).value, url: .request.url, csp: .response.headers[] | select(.name | contains("content-security-policy")).value?, contenttype: .response.headers[] | select(.name | contains("content-type")).value  } ' | grep status
+```
+
