@@ -54,3 +54,24 @@ cat browsertime.har| jq '.log.entries[]| {method: .request.method, status: .resp
 ```
 cat player.theplatform.eu.har | jq '.log.entries[] |select(.request.url | startswith("https://vod.tst1.talpatvcdn.nl/")) | {url: .request.url, size: .response.content.size}'
 ```
+
+if you want to create a csv (the first bit of jq is only to select the proper parts i needed for the sample.
+You can probably do this in one go also but would make the actual bit less usefull.
+```
+cat sample.json | jq '.datapoints[] ' | jq -r -s '. | (map(keys) | add | unique) as $cols | map(. as $row | $cols | map($row[.])) as $rows | $cols, $rows[]| @csv'
+"id","prop1","prop2","prop3","prop4"
+160,228,5,100,19966
+161,228,5,200,20066
+162,229,5,300,20166
+163,229,5,400,20266
+164,230,5,500,20356
+165,231,5,500,20466
+166,231,5,700,20566
+167,232,5,764,20650
+168,232,5,964,20750
+169,233,5,964,20850
+170,233,5,1064,20950
+171,234,5,1164,21050
+172,234,5,1264,21150
+1210,0,0,0,0
+```
