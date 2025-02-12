@@ -21,3 +21,18 @@ In the lambda-code you can now use the regular
 ```python
 import requests
 ```
+
+When you print have dumped a plain python dict and now want to use something
+like jq to parse it, you have to work your way around False vs false, None
+vs null ect.
+
+```
+echo "{'foo':False, 'bar':None, 'foobar': True}" |sed -e 's/False/false/g' -e 's/True/true/g'  -e 's/None/null/g' | tr "'" '"'  | jq
+
+{
+  "foo": false,
+  "bar": null,
+  "foobar": true
+}
+
+```
