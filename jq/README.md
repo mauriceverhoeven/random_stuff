@@ -1,7 +1,52 @@
 # JQ commands
 
+calulate with dates
+
+```
+{
+  "startIndex": 0,
+  "itemsPerPage": 100,
+  "entryCount": 100,
+  "entries": [
+    {
+      "guid": "a",
+      "some_detail": "foo_a",
+      "first_occurence": "2023-09-01T13:02:33Z",
+      "last_occurence": "2023-09-11T13:02:33Z"
+    },
+    {
+      "guid": "b",
+      "some_detail": "foo_b",
+      "first_occurence": "2023-09-02T13:02:33Z",
+      "last_occurence": "2023-09-11T13:02:33Z"
+    },
+    {
+      "guid": "c",
+      "some_detail": "foo_c",
+      "first_occurence": "2023-09-03T13:02:33Z",
+      "last_occurence": "2023-09-11T13:02:33Z"
+    },
+    {
+      "guid": "d",
+      "some_detail": "foo_d",
+      "first_occurence": "2023-09-10T13:02:33Z",
+      "last_occurence": "2023-09-11T13:02:33Z"
+    }
+  ]
+}
+```
+
+```
+cat sample| jq '.entries[] |  .+={"duration_seconds": ((.last_occurence|fromdate )- (.first_occurence|fromdate))}'
+```
+
+improve with ->
+
+jq -r -s '. | (map(keys) | add | unique) as $cols | map(. as $row | $cols | map($row[.])) as $rows | $cols, $rows[]| @csv'
+
 on a "flat" json like -->
-``` {
+
+```{
 	"datapoints": [{
 			"id": 160,
 			"prop1": 228,
@@ -11,21 +56,23 @@ on a "flat" json like -->
 		},
 		{
 			"id": 161,
-			"prop1": 228,... 
+			"prop1": 228,...
 ```
 
 use the keys from to 'auto-create' with some et-sed-tra to create the output to csv command
 
 ```
-cat sample.json| jq -c  ".datapoints[0]| keys" | tr -d '"' | sed -E s'/,/, ./'g | sed -E s'/\[(.+)/jq -c  ".datapoints[] | [.\1 | @csv"/' 
+cat sample.json| jq -c  ".datapoints[0]| keys" | tr -d '"' | sed -E s'/,/, ./'g | sed -E s'/\[(.+)/jq -c  ".datapoints[] | [.\1 | @csv"/'
 ```
 
-which results in:  
+which results in:
+
 ```
-jq -c  ".datapoints[] | [.id, .prop1, .prop2, .prop3, .prop4] | @csv" 
+jq -c  ".datapoints[] | [.id, .prop1, .prop2, .prop3, .prop4] | @csv"
 ```
 
 and can be used :
+
 ```
 cat sample.json| jq -c  ".datapoints[] | [.id, .prop1, .prop2, .prop3, .prop4] | @csv"
 "160,228,5,100,19966"
@@ -33,6 +80,7 @@ cat sample.json| jq -c  ".datapoints[] | [.id, .prop1, .prop2, .prop3, .prop4] |
 ```
 
 selecting stuff
+
 ```
 echo '{"files": [{"fileName": "FOO","md5": "blablabla"}, {"fileName": "BAR","md5": "alaldlafj"}]}'  | jq '.files[] | select(.fileName=="FOO") '
 {
@@ -57,6 +105,7 @@ cat player.theplatform.eu.har | jq '.log.entries[] |select(.request.url | starts
 
 if you want to create a csv (the first bit of jq is only to select the proper parts i needed for the sample.
 You can probably do this in one go also but would make the actual bit less usefull.
+
 ```
 cat sample.json | jq '.datapoints[] ' | jq -r -s '. | (map(keys) | add | unique) as $cols | map(. as $row | $cols | map($row[.])) as $rows | $cols, $rows[]| @csv'
 "id","prop1","prop2","prop3","prop4"
@@ -74,4 +123,13 @@ cat sample.json | jq '.datapoints[] ' | jq -r -s '. | (map(keys) | add | unique)
 171,234,5,1164,21050
 172,234,5,1264,21150
 1210,0,0,0,0
+```
+
+```
+jq '.result.entries[] | select(.guid == "YHRjsegKbagZur")'
+
+```
+
+```
+ffprobe -v error -hide_banner  -show_packets with_time.ts -print_format json  | jq -c -r  '.packets[]  |  del(.pos) | del(.flags) | del(.side_data_list) | [.codec_type ,.dts ,.dts_time ,.duration ,.duration_time ,.pts ,.pts_time ,.size ,.stream_index] | @csv'
 ```
